@@ -10,20 +10,20 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
+import representment.main.SimpleDummyLogger;
+
 public class ReportFileWriter {
 	
+	private static SimpleDummyLogger LOG = new SimpleDummyLogger();
+	
 	private String filename;
-	
 	private String filepath;
-	
 	private int totalPages;
-	
 	private ImageOutputStream outputStream;
-	
 	private ImageWriter writer;
 	
 	
-	public static ReportFileWriter createMultipageTiff(String filename, String filepath, String reportFormatName) {
+	public static ReportFileWriter createMultipageTiff(String filename, String filepath, String reportFormatName) throws IOException {
 		ReportFileWriter reportWriter = new ReportFileWriter(filename, filepath);
 		reportWriter.createOutputStream();
 		reportWriter.createImageWriter(reportFormatName);
@@ -35,7 +35,7 @@ public class ReportFileWriter {
 		this.filepath = filepath;
 	}
 
-	private void createImageWriter(String formatName) {
+	private void createImageWriter(String formatName) throws IOException {
 		Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(formatName);
 		if(writers.hasNext()) {
 			this.writer = writers.next();
@@ -45,26 +45,28 @@ public class ReportFileWriter {
 			this.writer.setOutput(this.outputStream);
 		}
 		else {
+			LOG.info("No writers available. Report cannot be created.");
 			throw new RuntimeException("No writers available");
 		}
 	}
 	
-	private void createOutputStream() {
+	private void createOutputStream() throws IOException{
 		try {
 			File file = new File(this.filename);
 			this.outputStream = ImageIO.createImageOutputStream(file);
+			LOG.debug("Output file created successfully");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.info("Output file creation failed with error:\n"+e.getStackTrace());
+			throw e;
 		}
 	}
 	
 	public void writeImageToNewPage(BufferedImage image) {
 		try {
+			LOG.debug("Writing image to report");
 			writer.writeToSequence(new IIOImage(image, null, null), null);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.info("Failed to write to report with error: "+e.getStackTrace());
 		}
 	}
 	

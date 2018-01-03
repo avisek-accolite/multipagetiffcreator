@@ -5,11 +5,16 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
+import representment.main.SimpleDummyLogger;
 import representment.tiffgenerator.Config;
 
 public class ImageGenerationUtilities {
 	
+	private static SimpleDummyLogger LOG = new SimpleDummyLogger();
+	
 	public static void scaleImage(BufferedImage inputImage, BufferedImage outputImage, float scaleFactor) {
+		
+		LOG.debug("Scaling image by scaling factor: "+scaleFactor);
 		
 		boolean centerVertical = false;
 		boolean centerHorizontal = false;
@@ -42,13 +47,16 @@ public class ImageGenerationUtilities {
 	public static float getScaleFactor(BufferedImage inputImage, BufferedImage outputImage) {
 		float horizontalScaleFactor = (float)outputImage.getWidth() / (float)inputImage.getWidth();
 		float verticalScaleFactor = (float)outputImage.getHeight() / (float)inputImage.getHeight();
-		return Math.min(horizontalScaleFactor, verticalScaleFactor);
+		float scaleFactor = Math.min(horizontalScaleFactor, verticalScaleFactor);
+		LOG.debug("Image scaling required with scale factor = "+scaleFactor);
+		return scaleFactor;
 	}
 	
 	public static void createDitheredImage(BufferedImage inputImage, BufferedImage outputImage, boolean scale) {
 		
 		BufferedImage scaledInputImage = new BufferedImage(outputImage.getWidth(), outputImage.getHeight(), BufferedImage.TYPE_INT_RGB);
 		ImageGenerationUtilities.scaleImage(inputImage, scaledInputImage, getScaleFactor(inputImage, scaledInputImage));
+		LOG.debug("Image scaled, applying dither to image");
 		
 		WritableRaster input = scaledInputImage.copyData(null);
 		WritableRaster output  = outputImage.getRaster();
@@ -58,6 +66,7 @@ public class ImageGenerationUtilities {
 		
 		final int threshold = 128;
 		float value, qerror;
+		LOG.info("Adding dither to image with threshold at "+threshold);
 
 		for (int y = 0; y < inputHeight; ++y) {
 			for (int x = 0; x < inputWidth; ++x) {
@@ -96,7 +105,6 @@ public class ImageGenerationUtilities {
 	}
 	
 	private static int clamp(float value) { 
-		
 		return Math.min(Math.max(Math.round(value), 0), 255); 
 	}
 	
@@ -105,12 +113,16 @@ public class ImageGenerationUtilities {
 		int bitDepth = Config.OUTPUT_BIT_DEPTH;
 		switch(bitDepth) {
 			case 1:
+				LOG.info("Output image set to black and white");
 				return BufferedImage.TYPE_BYTE_BINARY;
 			case 8:
+				LOG.info("Output image set to grayscale");
 				return BufferedImage.TYPE_BYTE_GRAY;
 			case 24:
+				LOG.info("Output image set to coloured");
 				return BufferedImage.TYPE_INT_RGB;
 			default:
+				LOG.info("Output image set to coloured");
 				return BufferedImage.TYPE_INT_RGB;
 		}
 	}

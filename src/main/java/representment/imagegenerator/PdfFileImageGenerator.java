@@ -15,10 +15,13 @@ import org.icepdf.core.pobjects.PDimension;
 import org.icepdf.core.pobjects.Page;
 import org.icepdf.core.util.GraphicsRenderingHints;
 
+import representment.main.SimpleDummyLogger;
 import representment.tiffgenerator.Config;
 
 public class PdfFileImageGenerator implements ImageGenerator {
 
+	private static SimpleDummyLogger LOG = new SimpleDummyLogger();
+	
 	private InputStream inputDocument;
 	
 	private final float ROTATION;
@@ -54,18 +57,17 @@ public class PdfFileImageGenerator implements ImageGenerator {
 			for(int pageNo=0; pageNo<pdfDocument.getNumberOfPages(); pageNo++) {
 				
 				PDimension pageDimension = pdfDocument.getPageDimension(pageNo, ROTATION);
+				LOG.debug("Dimensions of pdf page: "+pageDimension.getWidth()+"x"+pageDimension.getHeight());
 				
 				BufferedImage imagePage = new BufferedImage((int)pageDimension.getWidth(), (int)pageDimension.getHeight(), this.imageType);
-						
 				Graphics2D imageGraphics = imagePage.createGraphics();
-				
 				pdfDocument.paintPage(pageNo, imageGraphics, GraphicsRenderingHints.PRINT, Page.BOUNDARY_CROPBOX, ROTATION, SCALE);
-				
+				LOG.debug("Writing pdf page to image");
 				imageGraphics.dispose();
 				
 				if(this.imageType == BufferedImage.TYPE_BYTE_BINARY) {
-				
 					BufferedImage ditheredImagePage = new BufferedImage(this.pageWidth, this.pageHeight, this.imageType);
+					LOG.debug("Adding dither to image");
 					ImageGenerationUtilities.createDitheredImage(imagePage, ditheredImagePage, true);
 					imageFromPdf.add(ditheredImagePage);
 				}

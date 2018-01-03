@@ -7,7 +7,7 @@ public class Config {
 	public static final String META_LABEL_CURRENCY = "Currency";
 	public static final String META_LABEL_ADDITIONALINFO = "Additional Information";
 	public static final String META_FONT = "Arial";
-	public static final int META_FONT_SIZE = 16;
+	public static final int META_FONT_SIZE = 30;
 	public static final int META_PAGE_HEIGHT = 2000;
 	public static final int META_PAGE_WIDTH = 1700;
 	public static final String META_BACKGROUND_COLOR = "0xFFFFFF";

@@ -7,10 +7,13 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import representment.main.SimpleDummyLogger;
 import representment.tiffgenerator.Config;
 import representment.tiffgenerator.Representment;
 
 public class MetaTextImageGenerator implements ImageGenerator{
+	
+	private static SimpleDummyLogger LOG = new SimpleDummyLogger();
 	
 	Representment representment;
 	
@@ -41,7 +44,7 @@ public class MetaTextImageGenerator implements ImageGenerator{
 	public BufferedImage getReportMetaImage() {
 	    String[] reportMetaInformation = getReportMetatext();
 	    
-	    BufferedImage bufferedImage = new BufferedImage(pageWidth, pageHeight, getBufferedImageType());
+	    BufferedImage bufferedImage = new BufferedImage(pageWidth, pageHeight, ImageGenerationUtilities.getDefaultBufferedImageType());
 	    
 	    Graphics graphics = bufferedImage.getGraphics();
 	    graphics.setColor(backgroundColor);
@@ -52,6 +55,8 @@ public class MetaTextImageGenerator implements ImageGenerator{
 	    for(int line = 0; line<reportMetaInformation.length; line++) {
 	    	graphics.drawString(reportMetaInformation[line], 10, 25 + (line*lineHeight));	    	
 	    }
+	    
+	    LOG.debug("Meta text written to first page of report");
 	    
 	    return bufferedImage;
 	}
@@ -64,21 +69,9 @@ public class MetaTextImageGenerator implements ImageGenerator{
 		reportText[1] = Config.META_LABEL_AMOUNT + ": " + representment.getAmount();
 		reportText[2] = Config.META_LABEL_CURRENCY + ": " + representment.getCurrency();
 		reportText[3] = Config.META_LABEL_ADDITIONALINFO + ": " + representment.getAdditionalInfo();
-
+		
+		LOG.debug("Image meta text generated as \n"+reportText[0]+"\n"+reportText[1]+"\n"+reportText[2]+"\n"+reportText[3]);
+		
 		return reportText;
-	}
-	
-	public int getBufferedImageType() {
-		int bitDepth = Config.OUTPUT_BIT_DEPTH;
-		switch(bitDepth) {
-			case 1:
-				return BufferedImage.TYPE_BYTE_BINARY;
-			case 8:
-				return BufferedImage.TYPE_BYTE_GRAY;
-			case 24:
-				return BufferedImage.TYPE_INT_RGB;
-			default:
-				return BufferedImage.TYPE_INT_RGB;
-		}
 	}
 }

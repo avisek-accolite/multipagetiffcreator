@@ -12,10 +12,13 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
 
+import representment.main.SimpleDummyLogger;
 import representment.tiffgenerator.Config;
 
 public class ByteStreamImageGenerator implements ImageGenerator {
 
+	private static SimpleDummyLogger LOG = new SimpleDummyLogger();
+	
 	private InputStream inputDocument;
 	
 	private float ROTATION = 0.0f;
@@ -51,8 +54,7 @@ public class ByteStreamImageGenerator implements ImageGenerator {
 			return null;
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.info("Error in reading input document "+e.getMessage());
 		}
 		return null;
 	}
