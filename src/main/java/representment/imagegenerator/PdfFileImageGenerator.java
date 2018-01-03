@@ -23,11 +23,17 @@ public class PdfFileImageGenerator implements ImageGenerator {
 	
 	private final float ROTATION;
 	private final float SCALE;
+	private final int pageHeight;
+	private final int pageWidth;
+	private final int imageType;
 	
 	public PdfFileImageGenerator(InputStream file) {
 		this.inputDocument = file;
 		this.ROTATION = Config.INPUT_DEFAULT_IMAGE_ROTATION_ANGLE;
 		this.SCALE = Config.INPUT_DEFAULT_IMAGE_SCALE_RATIO;
+		this.pageHeight = Config.OUTPUT_DEFAULT_HEIGHT;
+		this.pageWidth = Config.OUTPUT_DEFAULT_WIDTH;
+		this.imageType = ImageGenerationUtilities.getDefaultBufferedImageType();
 	}
 	
 	public List<BufferedImage> generate() {
@@ -49,7 +55,7 @@ public class PdfFileImageGenerator implements ImageGenerator {
 				
 				PDimension pageDimension = pdfDocument.getPageDimension(pageNo, ROTATION);
 				
-				BufferedImage imagePage = new BufferedImage((int)pageDimension.getWidth(), (int)pageDimension.getHeight(), getBufferedImageType());
+				BufferedImage imagePage = new BufferedImage((int)pageDimension.getWidth(), (int)pageDimension.getHeight(), this.imageType);
 						
 				Graphics2D imageGraphics = imagePage.createGraphics();
 				
@@ -57,7 +63,15 @@ public class PdfFileImageGenerator implements ImageGenerator {
 				
 				imageGraphics.dispose();
 				
-				imageFromPdf.add(imagePage);
+				if(this.imageType == BufferedImage.TYPE_BYTE_BINARY) {
+				
+					BufferedImage ditheredImagePage = new BufferedImage(this.pageWidth, this.pageHeight, this.imageType);
+					ImageGenerationUtilities.createDitheredImage(imagePage, ditheredImagePage, true);
+					imageFromPdf.add(ditheredImagePage);
+				}
+				else {
+					imageFromPdf.add(imagePage);
+				}
 			}
 			
 			pdfDocument.dispose();
@@ -77,19 +91,6 @@ public class PdfFileImageGenerator implements ImageGenerator {
 		
 		return null;
 	}
-	
-	public int getBufferedImageType() {
-		int bitDepth = Config.OUTPUT_BIT_DEPTH;
-		switch(bitDepth) {
-			case 1:
-				return BufferedImage.TYPE_BYTE_BINARY;
-			case 8:
-				return BufferedImage.TYPE_BYTE_GRAY;
-			case 24:
-				return BufferedImage.TYPE_INT_RGB;
-			default:
-				return BufferedImage.TYPE_INT_RGB;
-		}
-	}
+
 	
 }
