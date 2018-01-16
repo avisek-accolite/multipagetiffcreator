@@ -15,6 +15,8 @@ import org.icepdf.core.pobjects.PDimension;
 import org.icepdf.core.pobjects.Page;
 import org.icepdf.core.util.GraphicsRenderingHints;
 
+import representment.imageconvertor.Convertor;
+import representment.imageconvertor.DitheredImageConvertor;
 import representment.main.SimpleDummyLogger;
 import representment.tiffgenerator.Config;
 
@@ -68,7 +70,8 @@ public class PdfFileImageGenerator implements ImageGenerator {
 				if(this.imageType == BufferedImage.TYPE_BYTE_BINARY) {
 					BufferedImage ditheredImagePage = new BufferedImage(this.pageWidth, this.pageHeight, this.imageType);
 					LOG.debug("Adding dither to image");
-					ImageGenerationUtilities.createDitheredImage(imagePage, ditheredImagePage, true);
+					Convertor ditherConvertor = new DitheredImageConvertor(imagePage, ditheredImagePage, true);
+					ditherConvertor.convert();
 					imageFromPdf.add(ditheredImagePage);
 				}
 				else {

@@ -15,8 +15,8 @@ public class Config {
 	
 	//Report configurtions
 	public static final int OUTPUT_BIT_DEPTH = 1;
-	public static final int OUTPUT_DEFAULT_HEIGHT = 2000;
-	public static final int OUTPUT_DEFAULT_WIDTH = 1700;
+	public static final int OUTPUT_DEFAULT_HEIGHT = 8000;
+	public static final int OUTPUT_DEFAULT_WIDTH = 6000;
 	
 	//Input default configurations
 	public static final float INPUT_DEFAULT_IMAGE_SCALE_RATIO = 1.0f;
@@ -24,5 +24,9 @@ public class Config {
 	public static final int INPUT_DEFAULT_HEIGHT = 2000;
 	public static final int INPUT_DEFAULT_WIDTH = 1700;
 	
+	//Dithering Configurations
+	public static final int BINARY_CONVERSION_THRESHOLD = 128;
 	
+	//Otsu Thresholding
+	public static final boolean USE_OTSU_THRESHOLDING = true;
 }

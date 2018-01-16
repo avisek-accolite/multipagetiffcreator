@@ -12,6 +12,10 @@ public class ImageGenerationUtilities {
 	
 	private static SimpleDummyLogger LOG = new SimpleDummyLogger();
 	
+	public static void grayscaleImage(BufferedImage inputImage, BufferedImage outputImage) {
+		
+	}
+	
 	public static void scaleImage(BufferedImage inputImage, BufferedImage outputImage, float scaleFactor) {
 		
 		LOG.debug("Scaling image by scaling factor: "+scaleFactor);
@@ -64,15 +68,13 @@ public class ImageGenerationUtilities {
 		int inputHeight = scaledInputImage.getHeight();
 		int inputWidth = scaledInputImage.getWidth();
 		
-		final int threshold = 128;
+		final int threshold = Config.BINARY_CONVERSION_THRESHOLD;
 		float value, qerror;
 		LOG.info("Adding dither to image with threshold at "+threshold);
 
 		for (int y = 0; y < inputHeight; ++y) {
 			for (int x = 0; x < inputWidth; ++x) {
 				value = input.getSample(x, y, 0);
-
-				// Threshold value and compute quantization error
 				if (value < threshold) {
 					output.setSample(x, y, 0, 0);
 					qerror = value;
@@ -81,24 +83,15 @@ public class ImageGenerationUtilities {
 					qerror = value - 255;
 				}
 
-				// Spread error amongst neighboring pixels
-				// Based on Floyd-Steinberg Dithering
-				// http://en.wikipedia.org/wiki/Floyd-Steinberg_dithering
-				if (true) {
-					if((x > 0) && (y > 0) && (x < (inputWidth-1)) && (y < (inputHeight-1))) {
-						// 7/16
-						value = input.getSample(x+1, y, 0);
-						input.setSample(x+1, y, 0, clamp(value + 0.4375f * qerror));
-						// 3/16
-						value = input.getSample(x-1, y+1, 0);
-						input.setSample(x-1, y+1, 0, clamp(value + 0.1875f * qerror));
-						// 5/16
-						value = input.getSample(x, y+1, 0);
-						input.setSample(x, y+1, 0, clamp(value + 0.3125f * qerror));
-						// 1/16
-						value = input.getSample(x+1, y+1, 0);
-						input.setSample(x+1, y+1, 0, clamp(value + 0.0625f * qerror));
-					}
+				if((x > 0) && (y > 0) && (x < (inputWidth-1)) && (y < (inputHeight-1))) {
+					value = input.getSample(x+1, y, 0);
+					input.setSample(x+1, y, 0, clamp(value + 0.4375f * qerror));
+					value = input.getSample(x-1, y+1, 0);
+					input.setSample(x-1, y+1, 0, clamp(value + 0.1875f * qerror));
+					value = input.getSample(x, y+1, 0);
+					input.setSample(x, y+1, 0, clamp(value + 0.3125f * qerror));
+					value = input.getSample(x+1, y+1, 0);
+					input.setSample(x+1, y+1, 0, clamp(value + 0.0625f * qerror));
 				}
 			}
 		}

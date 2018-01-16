@@ -12,6 +12,9 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
 
+import representment.imageconvertor.Convertor;
+import representment.imageconvertor.DitheredImageConvertor;
+import representment.imageconvertor.ImageScaleConvertor;
 import representment.main.SimpleDummyLogger;
 import representment.tiffgenerator.Config;
 
@@ -45,7 +48,15 @@ public class ByteStreamImageGenerator implements ImageGenerator {
 				BufferedImage outputImage = new BufferedImage(pageWidth, pageHeight, this.imageType);
 				
 				if(this.imageType == BufferedImage.TYPE_BYTE_BINARY) {
-					ImageGenerationUtilities.createDitheredImage(image, outputImage, true);
+					Convertor ditherConvertor = new DitheredImageConvertor(image, outputImage, true);
+					ditherConvertor.convert();
+				}
+				else {
+					Convertor scaleConvertor = new ImageScaleConvertor(image, ImageScaleConvertor.getScaleFactor(image, outputImage));
+					BufferedImage scaledInputImage = scaleConvertor.convert();
+					Graphics g = outputImage.getGraphics();
+					g.drawImage(scaledInputImage, 0, 0, null);
+					g.dispose();
 				}
 
 				imageFromJByteStream.add(outputImage);
